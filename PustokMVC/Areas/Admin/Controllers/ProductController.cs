@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PustokMVC.Contexts;
 using PustokMVC.Models;
+using PustokMVC.ViewModels.CategoryVM;
 using PustokMVC.ViewModels.ProductVM;
 using PustokMVC.ViewModels.SliderVM;
 
@@ -58,6 +59,37 @@ namespace PustokMVC.Areas.Admin.Controllers
             if (data == null) return RedirectToAction(nameof(Index));
             _db.Remove(data);
             await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Update(int id)
+        {
+            ViewBag.Categories = _db.Categories;
+            if (id == null) return BadRequest();
+            var data = await _db.Products.FindAsync(id);
+            if (data == null) return RedirectToAction(nameof(Index));
+            return View(new ProductUpdateVM
+            {
+                ImageUrl = data.ImageUrl,
+                CategoryId = data.CategoryId,
+                Title = data.Title,
+            });
+        }
+        [HttpPost]
+        public async Task<IActionResult> Update(int id, ProductUpdateVM vm)
+        {
+            if (id == null) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return View(vm);
+            }
+            var data = await _db.Products.FindAsync(id);
+            if (data == null) return NotFound();
+            data.CategoryId = vm.CategoryId;
+            data.Title = vm.Title;
+            data.ImageUrl = vm.ImageUrl;
+            await _db.SaveChangesAsync();
+            TempData["Response"] = true;
             return RedirectToAction(nameof(Index));
         }
     }

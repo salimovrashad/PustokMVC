@@ -4,6 +4,7 @@ using PustokMVC.Contexts;
 using PustokMVC.Models;
 using PustokMVC.ViewModels.CategoryVM;
 using PustokMVC.ViewModels.ProductVM;
+using PustokMVC.ViewModels.SliderVM;
 
 namespace PustokMVC.Areas.Admin.Controllers
 {
@@ -46,6 +47,42 @@ namespace PustokMVC.Areas.Admin.Controllers
             };
             await _db.Categories.AddAsync(category);
             await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id == null) return BadRequest();
+            var data = await _db.Categories.FindAsync(id);
+            if (data == null) return RedirectToAction(nameof(Index));
+            _db.Remove(data);
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Update(int id)
+        {
+            if (id == null) return BadRequest();
+            var data = await _db.Categories.FindAsync(id);
+            if (data == null) return RedirectToAction(nameof(Index));
+            return View(new CategoryUpdateVM
+            {
+                Name = data.Name
+            });
+        }
+        [HttpPost]
+        public async Task<IActionResult> Update(int id, CategoryUpdateVM vm)
+        {
+            if (id == null) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return View(vm);
+            }
+            var data = await _db.Categories.FindAsync(id);
+            if (data == null) return NotFound();
+            data.Name = vm.Name;
+            await _db.SaveChangesAsync();
+            TempData["Response"] = true;
             return RedirectToAction(nameof(Index));
         }
     }
