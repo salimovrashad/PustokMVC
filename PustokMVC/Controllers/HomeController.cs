@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PustokMVC.Contexts;
+using PustokMVC.ViewModels;
 
 namespace PustokMVC.Controllers
 {
@@ -8,9 +9,13 @@ namespace PustokMVC.Controllers
     {
         public async Task<IActionResult> Index()
         {
+            Class class1 = new Class();
             using PustokDBContext pustokDBContext = new PustokDBContext();
             var sliders = await pustokDBContext.Sliders.ToListAsync();
-            return View(sliders);
+            var products = await pustokDBContext.Products.ToListAsync();
+            class1.sliders = sliders;
+            class1.products = products;
+            return View(class1);
         }
     }
 }
