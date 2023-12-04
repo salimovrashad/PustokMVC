@@ -10,10 +10,14 @@ namespace PustokMVC.Areas.Admin.Controllers
     [Area("Admin")]
     public class SliderController : Controller
     {
+        PustokDBContext _db { get; }
+        public SliderController(PustokDBContext db)
+        {
+            _db = db;
+        }
         public async Task<IActionResult> Index()
         {
-            using PustokDBContext pustokDBContext = new PustokDBContext();
-            var items = await pustokDBContext.Sliders.Select(s => new SliderListItemVM
+            var items = await _db.Sliders.Select(s => new SliderListItemVM
             {
                 ImageUrl = s.ImageUrl,
                 Title = s.Title,
@@ -39,7 +43,6 @@ namespace PustokMVC.Areas.Admin.Controllers
             {
                 return View(vm);
             }
-            using PustokDBContext pustokDBContext = new PustokDBContext();
             Slider slider = new Slider
             {
                 Title = vm.Title,
@@ -52,8 +55,8 @@ namespace PustokMVC.Areas.Admin.Controllers
                     1 => false
                 }
             };
-            await pustokDBContext.Sliders.AddAsync(slider);
-            await pustokDBContext.SaveChangesAsync();
+            await _db.Sliders.AddAsync(slider);
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof (Index));
         }
 
@@ -61,11 +64,10 @@ namespace PustokMVC.Areas.Admin.Controllers
         {
             TempData["Response"] = false;
             if (id == null) return BadRequest();
-            using PustokDBContext pustokDBContext = new();
-            var data = await pustokDBContext.Sliders.FindAsync(id);
+            var data = await _db.Sliders.FindAsync(id);
             if (data == null) return RedirectToAction(nameof(Index));
-            pustokDBContext.Remove(data);
-            await pustokDBContext.SaveChangesAsync();
+            _db.Remove(data);
+            await _db.SaveChangesAsync();
             TempData["Response"] = true;
             return RedirectToAction(nameof(Index));
         }
@@ -73,8 +75,7 @@ namespace PustokMVC.Areas.Admin.Controllers
         public async Task<IActionResult> Update(int id)
         {
             if (id == null) return BadRequest();
-            using PustokDBContext pustokDBContext = new();
-            var data = await pustokDBContext.Sliders.FindAsync(id);
+            var data = await _db.Sliders.FindAsync(id);
             if (data == null) return RedirectToAction(nameof(Index));
             return View(new SliderUpdateVM
             {
@@ -102,8 +103,7 @@ namespace PustokMVC.Areas.Admin.Controllers
             {
                 return View(vm);
             }
-            using PustokDBContext pustokDBContext = new();
-            var data = await pustokDBContext.Sliders.FindAsync(id);
+            var data = await _db.Sliders.FindAsync(id);
             if (data == null) return NotFound();
             data.ImageUrl = vm.ImageUrl;
             data.Title = vm.Title;
@@ -114,7 +114,7 @@ namespace PustokMVC.Areas.Admin.Controllers
                 -1 => true,
                 1 => false
             };
-            await pustokDBContext.SaveChangesAsync();
+            await _db.SaveChangesAsync();
             TempData["Response"] = true;
             return RedirectToAction(nameof(Index));
         }

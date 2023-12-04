@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PustokMVC.Contexts;
 
@@ -11,9 +12,10 @@ using PustokMVC.Contexts;
 namespace PustokMVC.Migrations
 {
     [DbContext(typeof(PustokDBContext))]
-    partial class PustokDBContextModelSnapshot : ModelSnapshot
+    [Migration("20231204170438_CreatedProductsTable")]
+    partial class CreatedProductsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

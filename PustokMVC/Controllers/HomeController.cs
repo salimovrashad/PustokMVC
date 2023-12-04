@@ -7,12 +7,16 @@ namespace PustokMVC.Controllers
 {
     public class HomeController : Controller
     {
+        PustokDBContext _db { get; }
+        public HomeController(PustokDBContext db)
+        {
+            _db = db;
+        }
         public async Task<IActionResult> Index()
         {
             Class class1 = new Class();
-            using PustokDBContext pustokDBContext = new PustokDBContext();
-            var sliders = await pustokDBContext.Sliders.ToListAsync();
-            var products = await pustokDBContext.Products.ToListAsync();
+            var sliders = await _db.Sliders.ToListAsync();
+            var products = await _db.Products.ToListAsync();
             class1.sliders = sliders;
             class1.products = products;
             return View(class1);

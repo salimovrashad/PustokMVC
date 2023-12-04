@@ -10,19 +10,25 @@ namespace PustokMVC.Areas.Admin.Controllers
     [Area("Admin")]
     public class ProductController : Controller
     {
+        PustokDBContext _db { get; }
+        public ProductController(PustokDBContext db)
+        {
+            _db = db;
+        }
         public async Task<IActionResult> Index()
         {
-            using PustokDBContext pustokDBContext = new PustokDBContext();
-            var items = await pustokDBContext.Products.Select(s => new ProductListItemVM
+            var items = await _db.Products.Select(s => new ProductListItemVM
             {
                 ImageUrl = s.ImageUrl,
                 Title = s.Title,
                 Id = s.Id,
+                Category = s.Category,
             }).ToListAsync();
             return View(items);
         }
         public IActionResult Create()
         {
+            ViewBag.Categories = _db.Categories;
             return View();
         }
 
@@ -34,25 +40,24 @@ namespace PustokMVC.Areas.Admin.Controllers
             {
                 return View(vm);
             }
-            using PustokDBContext pustokDBContext = new PustokDBContext();
             Product product = new Product
             {
                 Title = vm.Title,
                 ImageUrl = vm.ImageUrl,
+                CategoryId = vm.CategoryId,
             };
-            await pustokDBContext.Products.AddAsync(product);
-            await pustokDBContext.SaveChangesAsync();
+            await _db.Products.AddAsync(product);
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Delete(int id)
         {
             if (id == null) return BadRequest();
-            using PustokDBContext pustokDBContext = new();
-            var data = await pustokDBContext.Products.FindAsync(id);
+            var data = await _db.Products.FindAsync(id);
             if (data == null) return RedirectToAction(nameof(Index));
-            pustokDBContext.Remove(data);
-            await pustokDBContext.SaveChangesAsync();
+            _db.Remove(data);
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
     }
